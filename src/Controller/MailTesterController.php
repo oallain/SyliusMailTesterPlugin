@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Synolia\SyliusMailTesterPlugin\Controller;
 
-use Sylius\Component\Channel\Context\ChannelContextInterface;
 use Sylius\Component\Mailer\Sender\SenderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -28,19 +27,14 @@ final class MailTesterController extends AbstractController
     /** @var TranslatorInterface */
     private $translator;
 
-    /** @var ChannelContextInterface */
-    private $channelContext;
-
     public function __construct(
         FormTypeResolver $formTypeResolver,
         FlashBagInterface $flashBag,
-        TranslatorInterface $translator,
-        ChannelContextInterface $channelContext
+        TranslatorInterface $translator
     ) {
         $this->formTypeResolver = $formTypeResolver;
         $this->flashBag = $flashBag;
         $this->translator = $translator;
-        $this->channelContext = $channelContext;
     }
 
     public function mailTester(Request $request, SenderInterface $sender): Response
@@ -119,8 +113,8 @@ final class MailTesterController extends AbstractController
             $emailData = $form->getData()[$type];
         }
 
-        $emailData['localeCode'] = 'en_US';
-        $emailData['channel'] = $this->channelContext->getChannel();
+        $emailData['localeCode'] = $form->get('localeCode')->getData()->getCode();
+        $emailData['channel'] = $form->get('channel')->getData();
 
         return $emailData;
     }
